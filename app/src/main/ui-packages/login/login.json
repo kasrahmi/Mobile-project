@@ -1,0 +1,813 @@
+{
+  "name": "login",
+  "version": 33,
+  "source-key": {
+    "type": "figma",
+    "file": "C3O5saLloORhPSXCuLb0s8",
+    "node": "4015:729",
+    "version": "2201290727704846817",
+    "component-id": "22bfcf13710d82f8cac15f83be2edd98c47ce6cc"
+  },
+  "default": "Login",
+  "design": {
+    "atoms": [
+      {
+        "type": "group",
+        "id": "top_level",
+        "root": "true"
+      },
+      {
+        "type": "group",
+        "id": "Content"
+      },
+      {
+        "type": "group",
+        "id": "Screen Title"
+      },
+      {
+        "type": "group",
+        "id": "Input Fields & Actions"
+      },
+      {
+        "type": "text",
+        "id": "Title Here"
+      },
+      {
+        "type": "text",
+        "id": "Description here"
+      },
+      {
+        "type": "group",
+        "id": "Input Fields"
+      },
+      {
+        "type": "group",
+        "id": "Actions"
+      },
+      {
+        "type": "group",
+        "id": "Input Field"
+      },
+      {
+        "type": "group",
+        "id": "Password"
+      },
+      {
+        "type": "text",
+        "id": "Label"
+      },
+      {
+        "type": "group",
+        "id": "Input Field1"
+      },
+      {
+        "type": "text",
+        "id": "Placeholder"
+      },
+      {
+        "type": "group",
+        "id": "Input Field2"
+      },
+      {
+        "type": "text",
+        "id": "Label1"
+      },
+      {
+        "type": "group",
+        "id": "Input Field3"
+      },
+      {
+        "type": "text",
+        "id": "Placeholder1"
+      },
+      {
+        "type": "group",
+        "id": "Button"
+      },
+      {
+        "type": "group",
+        "id": "Divider"
+      },
+      {
+        "type": "group",
+        "id": "Button1"
+      },
+      {
+        "type": "vector",
+        "id": "Left Line"
+      },
+      {
+        "type": "text",
+        "id": "Or"
+      },
+      {
+        "type": "vector",
+        "id": "Right Line"
+      },
+      {
+        "type": "text",
+        "id": "Text1"
+      }
+    ],
+    "modes": {
+      "Login": {
+        "rules": [
+          {
+            "id": "top_level",
+            "is-structured": false,
+            "children": [
+              "Content"
+            ],
+            "background-color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 1.0
+            }
+          },
+          {
+            "id": "Content",
+            "padding": {
+              "left": 16.0,
+              "top": 32.0,
+              "right": 16.0
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 0.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 101.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Screen Title",
+              "Input Fields & Actions"
+            ],
+            "item-spacing": 32.0,
+            "clip-content": false
+          },
+          {
+            "id": "Screen Title",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Title Here",
+              "Description here"
+            ],
+            "item-spacing": 16.0,
+            "clip-content": false
+          },
+          {
+            "id": "Input Fields & Actions",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Input Fields",
+              "Actions"
+            ],
+            "item-spacing": 40.0,
+            "clip-content": false
+          },
+          {
+            "id": "Title Here",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "font-weight": 700.0,
+            "color": {
+              "alpha": 1.0,
+              "hue": 266.0869565217391,
+              "saturation": 0.6216216216216217,
+              "value": 0.1450980392156863
+            },
+            "text-content": "Let’s Login",
+            "overflow": "visible",
+            "max-lines": -1,
+            "text-align": "left",
+            "text-size": 32.0,
+            "line-height": 1.2000000762939453,
+            "typeface": "Inter"
+          },
+          {
+            "id": "Description here",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "color": {
+              "alpha": 1.0,
+              "hue": 264.99999999999994,
+              "saturation": 0.08759124087591241,
+              "value": 0.5372549019607843
+            },
+            "text-content": "And notes your idea",
+            "overflow": "visible",
+            "max-lines": -1,
+            "text-align": "left",
+            "text-size": 16.0,
+            "line-height": 1.4,
+            "typeface": "Inter"
+          },
+          {
+            "id": "Input Fields",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Input Field",
+              "Password"
+            ],
+            "item-spacing": 32.0,
+            "clip-content": false
+          },
+          {
+            "id": "Actions",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Button",
+              "Divider",
+              "Button1"
+            ],
+            "item-spacing": 16.0,
+            "clip-content": false
+          },
+          {
+            "id": "Input Field",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Label",
+              "Input Field1"
+            ],
+            "item-spacing": 12.0,
+            "clip-content": false
+          },
+          {
+            "id": "Password",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Input Field2"
+            ],
+            "item-spacing": 12.0,
+            "clip-content": false
+          },
+          {
+            "id": "Label",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 328.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "font-weight": 500.0,
+            "color": {
+              "alpha": 1.0,
+              "hue": 266.0869565217391,
+              "saturation": 0.6216216216216217,
+              "value": 0.1450980392156863
+            },
+            "text-content": "Email Address",
+            "overflow": "visible",
+            "max-lines": -1,
+            "text-align": "left",
+            "text-size": 16.0,
+            "line-height": 1.4,
+            "typeface": "Inter"
+          },
+          {
+            "id": "Input Field1",
+            "padding": 16.0,
+            "border-radius": 8.0,
+            "tap-handler": "$onTapInput1",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "stroke-width": 1.0,
+            "stroke-alignment": "outside",
+            "stroke-color": {
+              "alpha": 1.0,
+              "hue": 270.0,
+              "saturation": 0.029556650246305317,
+              "value": 0.796078431372549
+            },
+            "arrangement": "row",
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Placeholder"
+            ],
+            "item-spacing": 10.0,
+            "background-color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 1.0
+            }
+          },
+          {
+            "id": "Placeholder",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "color": "$emailTextColor",
+            "text-content": "$emailTextContent",
+            "overflow": "visible",
+            "max-lines": -1,
+            "text-align": "left",
+            "text-size": 16.0,
+            "line-height": 1.4,
+            "typeface": "Inter"
+          },
+          {
+            "id": "Input Field2",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Label1",
+              "Input Field3"
+            ],
+            "item-spacing": 12.0,
+            "clip-content": false
+          },
+          {
+            "id": "Label1",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "font-weight": 500.0,
+            "color": {
+              "alpha": 1.0,
+              "hue": 266.0869565217391,
+              "saturation": 0.6216216216216217,
+              "value": 0.1450980392156863
+            },
+            "text-content": "Password",
+            "overflow": "visible",
+            "max-lines": -1,
+            "text-align": "left",
+            "text-size": 16.0,
+            "line-height": 1.4,
+            "typeface": "Inter"
+          },
+          {
+            "id": "Input Field3",
+            "padding": 16.0,
+            "border-radius": 8.0,
+            "tap-handler": "$onTapInput2",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "stroke-width": 1.0,
+            "stroke-alignment": "outside",
+            "stroke-color": {
+              "alpha": 1.0,
+              "hue": 270.0,
+              "saturation": 0.029556650246305317,
+              "value": 0.796078431372549
+            },
+            "arrangement": "row",
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Placeholder1"
+            ],
+            "item-spacing": 10.0,
+            "background-color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 1.0
+            }
+          },
+          {
+            "id": "Placeholder1",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "color": "$passwordTextColor",
+            "text-content": "$passwordTextContent",
+            "overflow": "visible",
+            "max-lines": -1,
+            "text-align": "left",
+            "text-size": 16.0,
+            "line-height": 1.4,
+            "typeface": "Inter"
+          },
+          {
+            "id": "Button",
+            "border-radius": 100.0,
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 54.0
+              }
+            },
+            "is-structured": false,
+            "children": "$onClickLogin",
+            "background-color": {
+              "alpha": 1.0,
+              "hue": 240.51724137931035,
+              "saturation": 0.5979381443298969,
+              "value": 0.7607843137254902
+            }
+          },
+          {
+            "id": "Divider",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "arrangement": "row",
+            "children": [
+              "Left Line",
+              "Or",
+              "Right Line"
+            ],
+            "item-spacing": 16.0
+          },
+          {
+            "id": "Button1",
+            "padding": {
+              "left": 24.0,
+              "top": 16.0,
+              "right": 24.0,
+              "bottom": 16.0
+            },
+            "border-radius": 100.0,
+            "tap-handler": "$onClickRegister",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "arrangement": "row",
+            "children": [
+              "Text1"
+            ],
+            "item-spacing": 10.0,
+            "clip-content": false
+          },
+          {
+            "id": "Left Line",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 0.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -1.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 0.0
+              }
+            },
+            "vector-content": "left_line.svg"
+          },
+          {
+            "id": "Or",
+            "font-weight": 500.0,
+            "color": {
+              "alpha": 1.0,
+              "hue": 264.99999999999994,
+              "saturation": 0.08759124087591241,
+              "value": 0.5372549019607843
+            },
+            "text-content": "Or",
+            "overflow": "visible",
+            "text-align-vertical": "center",
+            "text-size": 12.0,
+            "line-height": 1.2102272510528564,
+            "typeface": "Inter"
+          },
+          {
+            "id": "Right Line",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 0.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -1.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 0.0
+              }
+            },
+            "vector-content": "right_line.svg"
+          },
+          {
+            "id": "Text1",
+            "font-weight": 500.0,
+            "color": {
+              "alpha": 1.0,
+              "hue": 240.51724137931035,
+              "saturation": 0.5979381443298969,
+              "value": 0.7607843137254902
+            },
+            "text-content": "Don’t have any account? Register here",
+            "overflow": "visible",
+            "text-align-vertical": "center",
+            "text-size": 16.0,
+            "line-height": 1.4,
+            "typeface": "Inter"
+          }
+        ]
+      }
+    }
+  },
+  "parameters": {
+    "onTapInput1": {
+      "data-type": "void-callback",
+      "required": false,
+      "description": ""
+    },
+    "emailTextContent": {
+      "data-type": "text",
+      "required": false,
+      "description": ""
+    },
+    "emailTextColor": {
+      "data-type": "color",
+      "required": false,
+      "description": ""
+    },
+    "onTapInput2": {
+      "data-type": "void-callback",
+      "required": false,
+      "description": ""
+    },
+    "passwordTextContent": {
+      "data-type": "text",
+      "required": false,
+      "description": ""
+    },
+    "passwordTextColor": {
+      "data-type": "color",
+      "required": false,
+      "description": ""
+    },
+    "onClickLogin": {
+      "data-type": "list-item",
+      "required": false,
+      "description": ""
+    },
+    "onClickRegister": {
+      "data-type": "void-callback",
+      "required": false,
+      "description": ""
+    }
+  },
+  "previews": [
+    {
+      "design": "Login",
+      "size": {
+        "width": 360.0,
+        "height": 780.0
+      },
+      "parameters": {
+        "emailTextContent": "Example: johndoe@gmail.com",
+        "emailTextColor": {
+          "alpha": 1.0,
+          "hue": 270.0,
+          "saturation": 0.029556650246305317,
+          "value": 0.796078431372549
+        },
+        "passwordTextContent": "********",
+        "passwordTextColor": {
+          "alpha": 1.0,
+          "hue": 270.0,
+          "saturation": 0.029556650246305317,
+          "value": 0.796078431372549
+        },
+        "onClickLogin": [
+          {
+            "type": "text",
+            "alignment": {
+              "horizontal": {
+                "attachment": "center",
+                "offset": 0.5
+              },
+              "vertical": {
+                "attachment": "center",
+                "offset": 0.0
+              }
+            },
+            "font-weight": 500.0,
+            "color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 1.0
+            },
+            "text-content": "Login",
+            "overflow": "visible",
+            "text-align-vertical": "center",
+            "text-size": 16.0,
+            "line-height": 1.4,
+            "typeface": "Inter"
+          },
+          {
+            "type": "group",
+            "alignment": {
+              "horizontal": {
+                "attachment": "end",
+                "offset": -20.0
+              },
+              "vertical": {
+                "attachment": "center",
+                "offset": 0.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 20.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 20.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              {
+                "type": "vector",
+                "margin": {
+                  "left": 2.0,
+                  "top": 3.0,
+                  "right": 1.9999980926513672,
+                  "bottom": 3.0
+                },
+                "size-constraints": {
+                  "width-constraints": {
+                    "sizing-mode": "proportional",
+                    "value": 1.0
+                  },
+                  "height-constraints": {
+                    "sizing-mode": "proportional",
+                    "value": 1.0
+                  }
+                },
+                "vector-content": "icon.svg"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "adin-component-search-paths": [],
+  "image-search-paths": [],
+  "vector-search-paths": []
+}

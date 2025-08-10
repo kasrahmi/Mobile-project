@@ -39,26 +39,26 @@ fun RegisterScreen(
             .background(Color.White)
     ) {
         // Back to Login
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onBackToLogin() }
-                .padding(vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Back",
-                tint = Color(0xFF6366F1),
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Back to Login",
-                color = Color(0xFF6366F1),
-                fontSize = 16.sp
-            )
-        }
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .clickable { onBackToLogin() }
+//                .padding(vertical = 16.dp),
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            Icon(
+//                imageVector = Icons.Default.ArrowBack,
+//                contentDescription = "Back",
+//                tint = Color(0xFF6366F1),
+//                modifier = Modifier.size(20.dp)
+//            )
+//            Spacer(modifier = Modifier.width(8.dp))
+//            Text(
+//                text = "Back to Login",
+//                color = Color(0xFF6366F1),
+//                fontSize = 16.sp
+//            )
+//        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -176,7 +176,7 @@ fun RegisterScreen(
 
         // Register Button
         Button(
-            onClick = { onRegister(firstName, lastName, username, email, password) },
+            onClick = { onRegister(username, password, email, firstName, lastName) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),

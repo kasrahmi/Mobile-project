@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.devtools.ksp)
 }
 
 android {
@@ -66,10 +68,21 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
 
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
 
-//    implementation(libs.hilt.android)
-//    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.datastore.preferences)
 
+    implementation(libs.logging.interceptor.v4120)
 
-//    implementation(libs.androidx.datastore.preferences)
+//    implementation(libs.androidx.room.compiler)
+
+    implementation(libs.gson)
+
+    implementation(libs.hilt.android.v249)
+
+    ksp(libs.hilt.compiler)
+
+    ksp(libs.androidx.room.compiler.v261)
+
 }

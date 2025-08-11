@@ -20,7 +20,8 @@ class NoteDetailViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val noteId: String? = savedStateHandle.get<String>("noteId")
+    // TODO
+    private var noteId: String? = savedStateHandle.get<String>("noteId")
 
     private val _uiState = MutableStateFlow(NoteDetailUiState())
     val uiState = _uiState.asStateFlow()
@@ -47,7 +48,8 @@ class NoteDetailViewModel @Inject constructor(
                             title = it.title,
                             content = it.description,
                             lastEdited = formatLastEdited(it.updatedAt),
-                            isLoading = false
+                            isLoading = false,
+                            isEditing = true
                         )
                     }
                 }
@@ -96,7 +98,7 @@ class NoteDetailViewModel @Inject constructor(
 
     private fun autoSave() {
         viewModelScope.launch {
-            delay(1000) // Auto-save after 1 second of no changes
+            delay(50) // Auto-save after 1 second of no changes
             saveNote()
         }
     }
@@ -109,8 +111,11 @@ class NoteDetailViewModel @Inject constructor(
                     onSuccess = { note ->
                         _uiState.value = _uiState.value.copy(
                             isNewNote = false,
-                            lastEdited = formatLastEdited(note.updatedAt)
+                            lastEdited = formatLastEdited(note.updatedAt),
+                            isEditing = true
                         )
+                        savedStateHandle["noteId"] = note.id.toString() // Update noteId in SavedStateHandle
+                        noteId = note.id.toString() // Update local noteId
                     },
                     onFailure = { error ->
                         _uiState.value = _uiState.value.copy(error = error.message)

@@ -24,6 +24,8 @@ class NotesViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
+    private var allNotes: List<com.example.notable.view.screen.NoteItem> = emptyList()
+
     init {
         loadNotes()
         observeSearchQuery()
@@ -40,10 +42,20 @@ class NotesViewModel @Inject constructor(
                         backgroundColor = getRandomNoteColor()
                     )
                 }
-                _uiState.value = _uiState.value.copy(
-                    notes = noteItems,
-                    isLoading = false
-                )
+                allNotes = noteItems
+
+                // Only update displayed notes if not searching
+                if (_searchQuery.value.isBlank()) {
+                    _uiState.value = _uiState.value.copy(
+                        notes = noteItems,
+                        isLoading = false,
+                        isSearchActive = false,
+                        hasSearchResults = true
+                    )
+                } else {
+                    // If we're searching, re-apply the search
+                    performSearch(_searchQuery.value)
+                }
             }
         }
     }
@@ -53,33 +65,42 @@ class NotesViewModel @Inject constructor(
             _searchQuery
                 .debounce(300) // Debounce search queries
                 .collect { query ->
-                    if (query.isBlank()) {
-                        loadNotes()
-                    } else {
-                        searchNotes(query)
-                    }
+                    performSearch(query)
                 }
         }
     }
 
+    private fun performSearch(query: String) {
+        if (query.isBlank()) {
+            // Clear search - show all notes
+            _uiState.value = _uiState.value.copy(
+                notes = allNotes,
+                isSearchActive = false,
+                hasSearchResults = true
+            )
+        } else {
+            // Active search
+            val filteredNotes = allNotes.filter { note ->
+                note.title.contains(query, ignoreCase = true) ||
+                        note.preview.contains(query, ignoreCase = true)
+            }
+
+            _uiState.value = _uiState.value.copy(
+                notes = filteredNotes,
+                isSearchActive = true,
+                hasSearchResults = filteredNotes.isNotEmpty()
+            )
+        }
+    }
+
+    // MISSING METHOD 1: Update search query
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
     }
 
-    private fun searchNotes(query: String) {
-        viewModelScope.launch {
-            noteRepository.searchNotes(query).collect { notes ->
-                val noteItems = notes.map { note ->
-                    com.example.notable.view.screen.NoteItem(
-                        id = note.id.toString(),
-                        title = note.title,
-                        preview = note.description,
-                        backgroundColor = getRandomNoteColor()
-                    )
-                }
-                _uiState.value = _uiState.value.copy(notes = noteItems)
-            }
-        }
+    // MISSING METHOD 2: Clear search
+    fun clearSearch() {
+        _searchQuery.value = ""
     }
 
     fun syncNotes() {
@@ -105,5 +126,7 @@ class NotesViewModel @Inject constructor(
 data class NotesUiState(
     val notes: List<com.example.notable.view.screen.NoteItem> = emptyList(),
     val isLoading: Boolean = true,
-    val error: String? = null
+    val error: String? = null,
+    val isSearchActive: Boolean = false,
+    val hasSearchResults: Boolean = true
 )

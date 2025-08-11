@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,24 +26,26 @@ fun HomeWithNotesScreen(
         NoteItem(
             id = "1",
             title = "New Product Idea Design",
-            preview = "Create a mobile app UI Kit that provide a basic notes functionality but with some improvement.\n\nThere will be a choice to select what kind of notes that user needed, so the experience while taking notes can be unique based on the needs.",
-            backgroundColor = Color(0xFFFFF9C4)
+            preview = "Create a mobile app UI Kit that provide a basic notes functionality but with some improvement. There will be a choice to select what kind of notes that user needed, so the experience while taking notes can be unique based on the needs.",
+                    backgroundColor = Color(0xFFFFF9C4)
         ),
         NoteItem(
             id = "2",
             title = "New Product Idea Design",
-            preview = "Create a mobile app UI Kit that provide a basic notes functionality but with some improvement.\n\nThere will be a choice to select what kind of notes that user needed, so the experience while taking notes can be unique based on the needs.",
-            backgroundColor = Color(0xFFFFE0B2)
+            preview = "Create a mobile app UI Kit that provide a basic notes functionality but with some improvement. There will be a choice to select what kind of notes that user needed, so the experience while taking notes can be unique based on the needs.",
+                    backgroundColor = Color(0xFFFFE0B2)
         )
     ),
     searchQuery: String = "",
+    isSearchActive: Boolean = false,
+    hasSearchResults: Boolean = true,
     onSearchChange: (String) -> Unit = {},
+    onClearSearch: () -> Unit = {},
     onNoteClick: (String) -> Unit = {},
     onAddNoteClick: () -> Unit = {},
     onHomeClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {}
 ) {
-    var search by remember { mutableStateOf(searchQuery) }
 
     Box(
         modifier = Modifier
@@ -54,13 +57,10 @@ fun HomeWithNotesScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Search bar
+            // Search bar - Always visible
             OutlinedTextField(
-                value = search,
-                onValueChange = {
-                    search = it
-                    onSearchChange(it)
-                },
+                value = searchQuery,
+                onValueChange = onSearchChange,
                 placeholder = { Text("Search...", color = Color.Gray) },
                 leadingIcon = {
                     Icon(
@@ -68,6 +68,17 @@ fun HomeWithNotesScreen(
                         contentDescription = "Search",
                         tint = Color.Gray
                     )
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = onClearSearch) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = "Clear search",
+                                tint = Color.Gray
+                            )
+                        }
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -78,30 +89,46 @@ fun HomeWithNotesScreen(
                     unfocusedBorderColor = Color.Gray.copy(alpha = 0.3f),
                     focusedContainerColor = Color.Gray.copy(alpha = 0.1f),
                     unfocusedContainerColor = Color.Gray.copy(alpha = 0.1f)
-                )
+                ),
+                singleLine = true
             )
 
-            // Notes title
-            Text(
-                text = "Notes",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            // Notes grid
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.weight(1f)
-            ) {
-                items(notes) { note ->
-                    NoteCard(
-                        note = note,
-                        onClick = { onNoteClick(note.id) }
+            // Content based on search state
+            when {
+                isSearchActive && !hasSearchResults -> {
+                    // Show "No search results" message
+                    NoSearchResultsContent(
+                        searchQuery = searchQuery,
+                        onClearSearch = onClearSearch
                     )
+                }
+                else -> {
+                    // Show notes (filtered or all)
+                    Column {
+                        // Notes title
+                        Text(
+                            text = if (isSearchActive) "Search Results" else "Notes",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
+                        // Notes grid
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            items(notes) { note ->
+                                NoteCard(
+                                    note = note,
+                                    onClick = { onNoteClick(note.id) }
+                                )
+                            }
+                        }
+                    }
                 }
             }
 
@@ -170,6 +197,56 @@ fun HomeWithNotesScreen(
 }
 
 @Composable
+fun NoSearchResultsContent(
+    searchQuery: String,
+    onClearSearch: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.Search,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp),
+            tint = Color.Gray.copy(alpha = 0.6f)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "No results found",
+            style = MaterialTheme.typography.headlineSmall,
+            color = Color.Gray,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "No notes match $searchQuery",
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.Gray,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = onClearSearch,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF6366F1)
+            )
+        ) {
+            Text("Clear Search", color = Color.White)
+        }
+    }
+}
+
+@Composable
 fun NoteCard(
     note: NoteItem,
     onClick: () -> Unit
@@ -197,7 +274,6 @@ fun NoteCard(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
                     maxLines = 2,
-//                    overflow = TextOverflow.Ellipsis
                 )
             }
 
@@ -208,7 +284,6 @@ fun NoteCard(
                 fontSize = 12.sp,
                 color = Color.Gray,
                 maxLines = 6,
-//                overflow = TextOverflow.Ellipsis,
                 lineHeight = 16.sp
             )
         }

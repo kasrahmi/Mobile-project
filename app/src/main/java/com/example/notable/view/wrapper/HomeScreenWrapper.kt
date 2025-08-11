@@ -9,35 +9,28 @@ import com.example.notable.view.screen.EmptyHomeScreen
 import com.example.notable.view.screen.HomeWithNotesScreen
 import com.example.notable.view.viewmodel.NotesViewModel
 
+// This is what your HomeScreenWrapper should look like:
 @Composable
 fun HomeScreenWrapper(
     onNavigateToNote: (String) -> Unit,
     onNavigateToSettings: () -> Unit,
-    onNavigateToAddNote: () -> Unit,
-    viewModel: NotesViewModel = hiltViewModel()
+    onNavigateToAddNote: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
+    val notesViewModel: NotesViewModel = hiltViewModel()
+    val uiState by notesViewModel.uiState.collectAsState()
+    val searchQuery by notesViewModel.searchQuery.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.syncNotes()
-    }
-
-    if (uiState.notes.isEmpty() && !uiState.isLoading) {
-        EmptyHomeScreen(
-            onAddNoteClick = onNavigateToAddNote,
-            onHomeClick = { /* Already on home */ },
-            onSettingsClick = onNavigateToSettings
-        )
-    } else {
-        HomeWithNotesScreen(
-            notes = uiState.notes,
-            searchQuery = searchQuery,
-            onSearchChange = viewModel::updateSearchQuery,
-            onNoteClick = onNavigateToNote,
-            onAddNoteClick = onNavigateToAddNote,
-            onHomeClick = { /* Already on home */ },
-            onSettingsClick = onNavigateToSettings
-        )
-    }
+    HomeWithNotesScreen(
+        notes = uiState.notes,
+        searchQuery = searchQuery,
+        isSearchActive = uiState.isSearchActive,
+        hasSearchResults = uiState.hasSearchResults,
+        onSearchChange = { query -> notesViewModel.updateSearchQuery(query) },
+        onClearSearch = { notesViewModel.clearSearch() },
+        onNoteClick = onNavigateToNote,
+        onAddNoteClick = onNavigateToAddNote,
+        onHomeClick = { /* Already on home */ },
+        onSettingsClick = onNavigateToSettings
+    )
 }
+

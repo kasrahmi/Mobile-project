@@ -3,6 +3,7 @@ package com.example.notable.data
 import com.example.notable.core.Constants
 import com.example.notable.data.dto.AccessTokenResponse
 import com.example.notable.data.dto.ChangePasswordRequest
+import com.example.notable.data.dto.ChangePasswordResponse
 import com.example.notable.data.dto.CreateNoteRequest
 import com.example.notable.data.dto.NoteResponse
 import com.example.notable.data.dto.NotesResponse
@@ -32,11 +33,11 @@ interface NotableApi {
 
     //    TODO
 
-    @PUT("${Constants.USER_INFO_ENDPOINT}change-password/")
+    @POST("auth/change-password/")
     suspend fun changePassword(
         @Header("Authorization") token: String,
         @Body request: ChangePasswordRequest
-    ): Response<Unit>
+    ): Response<ChangePasswordResponse>
 
     @GET(Constants.NOTES_ENDPOINT)
     suspend fun getNotes(

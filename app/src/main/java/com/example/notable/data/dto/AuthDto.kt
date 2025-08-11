@@ -64,7 +64,11 @@ data class UserDto(
 )
 
 data class ChangePasswordRequest(
-    val current_password: String,
+    val old_password: String,
     val new_password: String
+)
+
+data class ChangePasswordResponse(
+    val detail: String
 )
 

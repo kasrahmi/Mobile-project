@@ -3,7 +3,7 @@ package com.example.notable.model.repository
 import com.example.notable.model.User
 
 interface AuthRepository {
-    suspend fun login(username: String, password: String): Result<Unit>
+    suspend fun login(username: String, password: String): Result<User>
     suspend fun register(
         username: String,
         email: String,

@@ -9,6 +9,7 @@ import com.google.gson.Gson
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.core.content.edit
 
 @Singleton
 class TokenManager @Inject constructor(
@@ -22,6 +23,7 @@ class TokenManager @Inject constructor(
         private const val ACCESS_TOKEN_KEY = "access_token"
         private const val REFRESH_TOKEN_KEY = "refresh_token"
         private const val TOKEN_EXPIRY_KEY = "token_expiry"
+        private const val USER_INFO_KEY = "user_info"
         private const val ACCESS_TOKEN_LIFETIME_MS = 30 * 60 * 1000L // 30 minutes
         private const val REFRESH_BUFFER_MS = 5 * 60 * 1000L // Refresh 5 minutes before expiry
     }
@@ -54,15 +56,35 @@ class TokenManager @Inject constructor(
         return System.currentTimeMillis() >= (expiryTime - REFRESH_BUFFER_MS)
     }
 
-    fun clearTokens() {
-        prefs.edit().clear().apply()
+    // Add methods to handle user info
+    fun saveUserInfo(user: User) {
+        val userJson = Gson().toJson(user)
+        prefs.edit() { putString(USER_INFO_KEY, userJson) }
     }
 
-    fun hasValidTokens(): Boolean {
-        return !getAccessToken().isNullOrEmpty() && !isTokenExpired()
+    fun getUserInfo(): User? {
+        val userJson = prefs.getString(USER_INFO_KEY, null)
+        return if (userJson != null) {
+            Gson().fromJson(userJson, User::class.java)
+        } else null
     }
+
+    fun getCurrentUserId(): Int? {
+        return getUserInfo()?.id
+    }
+
+    fun clearTokens() {
+        prefs.edit() {
+            remove(ACCESS_TOKEN_KEY)
+                .remove(REFRESH_TOKEN_KEY)
+                .remove(TOKEN_EXPIRY_KEY)
+                .remove(USER_INFO_KEY)
+        }
+    }
+
+    fun hasValidTokens(): Boolean = !getAccessToken().isNullOrEmpty() && !isTokenExpired()
 
     fun notifyTokenRefreshed() {
-        _tokenRefreshed.value = true
+        _tokenRefreshed.postValue(true)
     }
 }

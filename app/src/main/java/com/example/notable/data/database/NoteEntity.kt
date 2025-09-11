@@ -13,5 +13,6 @@ data class NoteEntity(
     val creatorName: String,
     val creatorUsername: String,
     val isLocal: Boolean = false,
-    val needsSync: Boolean = false
+    val needsSync: Boolean = false,
+    val userId: Int
 )

@@ -5,7 +5,6 @@ import com.example.notable.data.dto.NoteDto
 import com.example.notable.data.dto.NoteResponse
 import com.example.notable.model.Note
 
-
 fun NoteDto.toDomain(): Note {
     return Note(
         id = id,
@@ -36,29 +35,31 @@ fun NoteEntity.toDomain(): Note {
     )
 }
 
-fun Note.toEntity(): NoteEntity {
+fun Note.toEntity(userId: Int): NoteEntity {
     return NoteEntity(
         id = id,
         title = title,
         description = description,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        creatorName = "", // Default values since Note doesn't have these
+        creatorName = "",
         creatorUsername = "",
+        userId = userId, // Add userId
         isLocal = false,
         needsSync = false
     )
 }
 
-fun NoteDto.toEntity(): NoteEntity {
+fun NoteDto.toEntity(userId: Int): NoteEntity {
     return NoteEntity(
         id = id,
         title = title,
         description = description,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        creatorName = "", // These fields aren't in NoteDto, so using defaults
-        creatorUsername = "",
+        creatorName = creatorName,
+        creatorUsername = creatorUsername,
+        userId = userId, // Add userId
         isLocal = false,
         needsSync = false
     )

@@ -31,8 +31,6 @@ interface NotableApi {
     @GET(Constants.USER_INFO_ENDPOINT)
     suspend fun getUserInfo(@Header("Authorization") token: String): Response<UserDto>
 
-    //    TODO
-
     @POST("auth/change-password/")
     suspend fun changePassword(
         @Header("Authorization") token: String,
@@ -40,7 +38,7 @@ interface NotableApi {
     ): Response<ChangePasswordResponse>
 
     @GET(Constants.NOTES_ENDPOINT)
-    suspend fun getNotes(
+    suspend fun getUserNotes(
         @Header("Authorization") token: String,
         @Query("page_size") page: Int
     ): Response<NotesResponse>

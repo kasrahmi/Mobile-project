@@ -25,10 +25,16 @@ class NoteRepositoryImpl @Inject constructor(
 ) : NoteRepository {
 
     override suspend fun getAllNotes(): Flow<List<Note>> {
-        // Always return local data first, then sync in background
         syncNotesIfNeeded()
-        return noteDao.getAllNotes().map { entities ->
-            entities.map { it.toDomain() }
+        val userId = tokenManager.getCurrentUserId()
+        return if (userId != null) {
+            noteDao.getNotesByUser(userId).map { entities ->
+                entities.map { it.toDomain() }
+            }
+        } else {
+            noteDao.getAllNotes().map { entities ->
+                entities.map { it.toDomain() }
+            }
         }
     }
 
@@ -41,8 +47,10 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun createNote(title: String, description: String): Result<Note> {
         return withContext(Dispatchers.IO) {
             try {
+                val userId = tokenManager.getCurrentUserId()
+                    ?: return@withContext Result.failure(Exception("User not authenticated"))
+
                 if (networkManager.isNetworkAvailable()) {
-                    // Try to create on server first
                     val token = tokenManager.getAccessToken()
                         ?: return@withContext Result.failure(Exception("No access token"))
 
@@ -52,8 +60,7 @@ class NoteRepositoryImpl @Inject constructor(
                     if (response.isSuccessful) {
                         response.body()?.let { noteResponse ->
                             val note = noteResponse.toDomain()
-                            // Save to local database
-                            noteDao.insertNote(note.toEntity())
+                            noteDao.insertNote(note.toEntity(userId))
                             Result.success(note)
                         } ?: Result.failure(Exception("Empty response body"))
                     } else {
@@ -64,15 +71,14 @@ class NoteRepositoryImpl @Inject constructor(
                         }
                     }
                 } else {
-                    // Create locally when offline
                     val localNote = Note(
-                        id = 0, // Will be assigned by Room
+                        id = 0,
                         title = title,
                         description = description,
                         createdAt = System.currentTimeMillis().toString(),
                         updatedAt = System.currentTimeMillis().toString()
                     )
-                    val id = noteDao.insertNote(localNote.toEntity())
+                    val id = noteDao.insertNote(localNote.toEntity(userId))
                     val createdNote = localNote.copy(id = id.toInt())
                     Result.success(createdNote)
                 }
@@ -85,6 +91,9 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun updateNote(id: Int, title: String, description: String): Result<Note> {
         return withContext(Dispatchers.IO) {
             try {
+                val userId = tokenManager.getCurrentUserId()
+                    ?: return@withContext Result.failure(Exception("User not authenticated"))
+
                 if (networkManager.isNetworkAvailable()) {
                     val token = tokenManager.getAccessToken()
                         ?: return@withContext Result.failure(Exception("No access token"))
@@ -95,8 +104,7 @@ class NoteRepositoryImpl @Inject constructor(
                     if (response.isSuccessful) {
                         response.body()?.let { noteResponse ->
                             val note = noteResponse.toDomain()
-                            // Update local database
-                            noteDao.updateNote(note.toEntity())
+                            noteDao.updateNote(note.toEntity(userId))
                             Result.success(note)
                         } ?: Result.failure(Exception("Empty response body"))
                     } else {
@@ -107,14 +115,14 @@ class NoteRepositoryImpl @Inject constructor(
                         }
                     }
                 } else {
-                    // Update locally when offline
                     val existingNote = noteDao.getNoteById(id)
                         ?: return@withContext Result.failure(Exception("Note not found"))
 
                     val updatedNote = existingNote.copy(
                         title = title,
                         description = description,
-                        updatedAt = System.currentTimeMillis().toString()
+                        updatedAt = System.currentTimeMillis().toString(),
+                        needsSync = true
                     )
                     noteDao.updateNote(updatedNote)
                     Result.success(updatedNote.toDomain())
@@ -135,7 +143,6 @@ class NoteRepositoryImpl @Inject constructor(
                     val response = api.deleteNote("Bearer $token", id)
 
                     if (response.isSuccessful) {
-                        // Delete from local database
                         noteDao.deleteNoteById(id)
                         Result.success(Unit)
                     } else {
@@ -146,7 +153,6 @@ class NoteRepositoryImpl @Inject constructor(
                         }
                     }
                 } else {
-                    // Delete locally when offline
                     noteDao.deleteNoteById(id)
                     Result.success(Unit)
                 }
@@ -157,101 +163,72 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun searchNotes(query: String): Flow<List<Note>> {
-        return noteDao.searchNotes("%$query%").map { entities ->
-            entities.map { it.toDomain() }
+        val userId = tokenManager.getCurrentUserId()
+        return if (userId != null) {
+            noteDao.searchNotesByUser(userId, query).map { entities ->
+                entities.map { it.toDomain() }
+            }
+        } else {
+            noteDao.searchNotes(query).map { entities ->
+                entities.map { it.toDomain() }
+            }
         }
     }
 
     override suspend fun syncNotes() {
         if (!networkManager.isNetworkAvailable()) return
 
-        withContext(Dispatchers.IO) {
-            try {
-                val token = tokenManager.getAccessToken() ?: return@withContext
+        try {
+            val token = tokenManager.getAccessToken() ?: return
+            val userId = tokenManager.getCurrentUserId() ?: return
 
-                var page = 1
-                var hasMore = true
+            val response = api.getUserNotes(
+                "Bearer $token",
+                page = 0
+            )
 
-                while (hasMore) {
-                    val response = api.getNotes("Bearer $token", page)
+            if (response.isSuccessful) {
+                response.body()?.let { notesResponse ->
+                    // Clear existing notes for this user and insert new ones
+                    noteDao.deleteNotesByUser(userId)
 
-                    if (response.isSuccessful) {
-                        response.body()?.let { notesResponse ->
-                            // Save notes to local database
-                            val noteEntities = notesResponse.results.map { it.toEntity() }
-                            noteDao.insertNotes(noteEntities)
-
-                            hasMore = notesResponse.next != null
-                            page++
-                        } ?: run { hasMore = false }
-                    } else {
-                        if (response.code() == 401) {
-                            // For syncNotes, we need to handle the Unit return type
-                            refreshTokenForSync()
-                            return@withContext
-                        } else {
-                            hasMore = false
-                        }
+                    notesResponse.results.forEach { noteDto ->
+                        noteDao.insertNote(noteDto.toEntity(userId))
                     }
                 }
-            } catch (e: Exception) {
-                // Sync failed, but continue with local data
             }
+        } catch (e: Exception) {
+            // Handle sync error
         }
     }
 
     private suspend fun syncNotesIfNeeded() {
-        // Only sync if we have network and haven't synced recently
         if (networkManager.isNetworkAvailable()) {
-            try {
-                syncNotes()
-            } catch (e: Exception) {
-                // Ignore sync errors
-            }
+            syncNotes()
         }
     }
 
-    private suspend fun <T> refreshTokenAndRetry(operation: suspend () -> Result<T>): Result<T> {
+    private suspend fun <T> refreshTokenAndRetry(action: suspend () -> Result<T>): Result<T> {
         return try {
             val refreshToken = tokenManager.getRefreshToken()
                 ?: return Result.failure(Exception("No refresh token"))
 
-            val response = api.refreshToken(RefreshTokenRequest(refreshToken))
+            val request = RefreshTokenRequest(refreshToken)
+            val response = api.refreshToken(request)
+
             if (response.isSuccessful) {
                 response.body()?.let { accessTokenResponse ->
                     val currentRefreshToken = tokenManager.getRefreshToken() ?: ""
                     tokenManager.saveTokens(accessTokenResponse.access, currentRefreshToken)
-                    operation()
-                } ?: Result.failure(Exception("Failed to refresh token"))
+                    action()
+                } ?: Result.failure(Exception("Empty response body"))
             } else {
-                // Refresh token is invalid
                 tokenManager.clearTokens()
-                Result.failure(Exception("Session expired"))
+                Result.failure(Exception("Refresh token expired"))
             }
         } catch (e: Exception) {
             tokenManager.clearTokens()
             Result.failure(e)
-        }
-    }
-
-    private suspend fun refreshTokenForSync() {
-        try {
-            val refreshToken = tokenManager.getRefreshToken() ?: return
-
-            val response = api.refreshToken(RefreshTokenRequest(refreshToken))
-            if (response.isSuccessful) {
-                response.body()?.let { accessTokenResponse ->
-                    val currentRefreshToken = tokenManager.getRefreshToken() ?: ""
-                    tokenManager.saveTokens(accessTokenResponse.access, currentRefreshToken)
-                    // Retry sync after refreshing token
-                    syncNotes()
-                }
-            } else {
-                // Refresh token is invalid
-                tokenManager.clearTokens()
-            }
-        } catch (e: Exception) {
-            tokenManager.clearTokens()
         }
     }
 }

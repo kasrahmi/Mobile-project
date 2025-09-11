@@ -24,8 +24,10 @@ object DatabaseModule {
             context,
             NotableDatabase::class.java,
             "notable_database"
-        ).build()
+        ).addMigrations(NotableDatabase.MIGRATION_1_2)
+            .build()
     }
+
 
     @Provides
     @Singleton

@@ -19,7 +19,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val tokenManager: TokenManager
 ) : AuthRepository {
 
-    override suspend fun login(username: String, password: String): Result<Unit> {
+    override suspend fun login(username: String, password: String): Result<User> {
         return withContext(Dispatchers.IO) {
             try {
                 val request = TokenRequest(username, password)
@@ -28,7 +28,18 @@ class AuthRepositoryImpl @Inject constructor(
                 if (response.isSuccessful) {
                     response.body()?.let { tokenResponse ->
                         tokenManager.saveTokens(tokenResponse.access, tokenResponse.refresh)
-                        Result.success(Unit)
+
+                        // Get and save user info
+                        val userInfoResponse = api.getUserInfo("Bearer ${tokenResponse.access}")
+                        if (userInfoResponse.isSuccessful) {
+                            userInfoResponse.body()?.let { userDto ->
+                                val user = userDto.toDomainModel()
+                                tokenManager.saveUserInfo(user)
+                                Result.success(user)
+                            } ?: Result.failure(Exception("Failed to get user info"))
+                        } else {
+                            Result.failure(Exception("Failed to get user info"))
+                        }
                     } ?: Result.failure(Exception("Empty response body"))
                 } else {
                     Result.failure(Exception("Login failed: ${response.message()}"))
@@ -38,6 +49,7 @@ class AuthRepositoryImpl @Inject constructor(
             }
         }
     }
+
 
     override suspend fun register(
         username: String,

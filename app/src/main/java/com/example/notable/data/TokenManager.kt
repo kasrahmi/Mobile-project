@@ -26,6 +26,10 @@ class TokenManager @Inject constructor(
         private const val USER_INFO_KEY = "user_info"
         private const val ACCESS_TOKEN_LIFETIME_MS = 30 * 60 * 1000L // 30 minutes
         private const val REFRESH_BUFFER_MS = 5 * 60 * 1000L // Refresh 5 minutes before expiry
+
+        private const val USER_ID_KEY = "user_id"
+        private const val USER_NAME_KEY = "user_name"
+        private const val USERNAME_KEY = "username"
     }
 
     fun saveTokens(accessToken: String?, refreshToken: String?) {
@@ -87,4 +91,22 @@ class TokenManager @Inject constructor(
     fun notifyTokenRefreshed() {
         _tokenRefreshed.postValue(true)
     }
+
+    fun saveUserInfo(userId: Int, userName: String, username: String) {
+        prefs.edit().apply {
+            putInt(USER_ID_KEY, userId)
+            putString(USER_NAME_KEY, userName)
+            putString(USERNAME_KEY, username)
+            apply()
+        }
+    }
+
+//    fun getCurrentUserId(): Int? {
+//        val userId = prefs.getInt(USER_ID_KEY, -1)
+//        return userId
+//    }
+
+    fun getCurrentUserName(): String? = prefs.getString(USER_NAME_KEY, null)
+
+    fun getCurrentUsername(): String? = prefs.getString(USERNAME_KEY, null)
 }

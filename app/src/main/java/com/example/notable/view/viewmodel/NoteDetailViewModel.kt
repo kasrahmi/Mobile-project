@@ -29,6 +29,11 @@ class NoteDetailViewModel @Inject constructor(
     private val _showDeleteDialog = MutableStateFlow(false)
     val showDeleteDialog = _showDeleteDialog.asStateFlow()
 
+    // Track original content to detect changes
+    private var originalTitle: String = ""
+    private var originalContent: String = ""
+    private var hasUnsavedChanges: Boolean = false
+
     init {
         loadNote()
     }
@@ -40,10 +45,17 @@ class NoteDetailViewModel @Inject constructor(
                     isEditing = true,
                     isNewNote = true
                 )
+                // For new notes, original values are empty
+                originalTitle = ""
+                originalContent = ""
             } else {
                 viewModelScope.launch {
                     val note = noteRepository.getNoteById(id.toInt())
                     note?.let {
+                        // Store original values
+                        originalTitle = it.title
+                        originalContent = it.description
+
                         _uiState.value = _uiState.value.copy(
                             title = it.title,
                             content = it.description,
@@ -59,12 +71,24 @@ class NoteDetailViewModel @Inject constructor(
 
     fun updateTitle(newTitle: String) {
         _uiState.value = _uiState.value.copy(title = newTitle)
-        autoSave()
+        checkForChanges()
+        if (hasUnsavedChanges) {
+            autoSave()
+        }
     }
 
     fun updateContent(newContent: String) {
         _uiState.value = _uiState.value.copy(content = newContent)
-        autoSave()
+        checkForChanges()
+        if (hasUnsavedChanges) {
+            autoSave()
+        }
+    }
+
+    private fun checkForChanges() {
+        val currentState = _uiState.value
+        hasUnsavedChanges = currentState.title != originalTitle ||
+                currentState.content != originalContent
     }
 
     fun toggleEditMode() {
@@ -98,33 +122,52 @@ class NoteDetailViewModel @Inject constructor(
 
     private fun autoSave() {
         viewModelScope.launch {
-            delay(50) // Auto-save after 1 second of no changes
-            saveNote()
+            delay(50) // Auto-save after 50ms of no changes
+            if (hasUnsavedChanges) { // Only save if there are actual changes
+                saveNote()
+            }
         }
     }
 
     fun saveNote() {
+        // Only save if there are actual changes or it's a new note
+        if (!hasUnsavedChanges && !_uiState.value.isNewNote) {
+            return
+        }
+
         viewModelScope.launch {
             val state = _uiState.value
             if (state.isNewNote) {
+                // Always save new notes
                 noteRepository.createNote(state.title, state.content).fold(
                     onSuccess = { note ->
+                        // Update original values after successful save
+                        originalTitle = state.title
+                        originalContent = state.content
+                        hasUnsavedChanges = false
+
                         _uiState.value = _uiState.value.copy(
                             isNewNote = false,
                             lastEdited = formatLastEdited(note.updatedAt),
                             isEditing = true
                         )
-                        savedStateHandle["noteId"] = note.id.toString() // Update noteId in SavedStateHandle
-                        noteId = note.id.toString() // Update local noteId
+                        savedStateHandle["noteId"] = note.id.toString()
+                        noteId = note.id.toString()
                     },
                     onFailure = { error ->
                         _uiState.value = _uiState.value.copy(error = error.message)
                     }
                 )
             } else {
+                // Only update existing notes if there are changes
                 noteId?.let { id ->
                     noteRepository.updateNote(id.toInt(), state.title, state.content).fold(
                         onSuccess = { note ->
+                            // Update original values after successful save
+                            originalTitle = state.title
+                            originalContent = state.content
+                            hasUnsavedChanges = false
+
                             _uiState.value = _uiState.value.copy(
                                 lastEdited = formatLastEdited(note.updatedAt)
                             )
@@ -138,9 +181,34 @@ class NoteDetailViewModel @Inject constructor(
         }
     }
 
+    // Call this when navigating back to save only if needed
+    fun saveOnExit() {
+        if (hasUnsavedChanges || _uiState.value.isNewNote) {
+            saveNote()
+        }
+    }
+
+    // Public method to check if there are unsaved changes
+    fun hasUnsavedChanges(): Boolean = hasUnsavedChanges
+
     private fun formatLastEdited(timestamp: String): String {
-        // Format timestamp to "Last edited on 19.30" format
-        return "Last edited on ${timestamp.substring(11, 16)}"
+        return try {
+            val instant = java.time.Instant.parse(timestamp)
+
+            // Convert to local time
+            val localDateTime = java.time.LocalDateTime.ofInstant(
+                instant,
+                java.time.ZoneId.systemDefault()
+            )
+
+            // Format as "Last edited on Sep 12, 2025 at 14:30"
+            val formatter = java.time.format.DateTimeFormatter.ofPattern("MMM d, yyyy 'at' HH:mm")
+            "Last edited on ${localDateTime.format(formatter)}"
+
+        } catch (e: Exception) {
+            // Fallback for invalid timestamps
+            "Last edited on $timestamp"
+        }
     }
 }
 

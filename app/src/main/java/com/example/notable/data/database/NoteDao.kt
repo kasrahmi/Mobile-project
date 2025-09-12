@@ -5,15 +5,17 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDao {
-    @Query("SELECT * FROM notes ORDER BY updatedAt DESC")
-    fun getAllNotes(): Flow<List<NoteEntity>>
-
-    // Add this method to get notes for specific user
-    @Query("SELECT * FROM notes WHERE userId = :userId ORDER BY updatedAt DESC")
+    @Query("SELECT * FROM notes WHERE userId = :userId AND isDeleted = 0 ORDER BY updatedAt DESC")
     fun getNotesByUser(userId: Int): Flow<List<NoteEntity>>
 
-    @Query("SELECT * FROM notes WHERE id = :id")
+    @Query("SELECT * FROM notes WHERE id = :id AND isDeleted = 0")
     suspend fun getNoteById(id: Int): NoteEntity?
+
+    @Query("SELECT * FROM notes WHERE serverId = :serverId AND isDeleted = 0")
+    suspend fun getNoteByServerId(serverId: Int): NoteEntity?
+
+    @Query("SELECT * FROM notes WHERE userId = :userId AND isDeleted = 0 AND (title LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%') ORDER BY updatedAt DESC")
+    fun searchNotesByUser(userId: Int, query: String): Flow<List<NoteEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNote(note: NoteEntity): Long
@@ -24,31 +26,35 @@ interface NoteDao {
     @Update
     suspend fun updateNote(note: NoteEntity)
 
-    @Delete
-    suspend fun deleteNote(note: NoteEntity)
+    @Query("UPDATE notes SET isDeleted = 1, syncStatus = :syncStatus, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun softDeleteNote(id: Int, syncStatus: SyncStatus, updatedAt: String)
 
     @Query("DELETE FROM notes WHERE id = :id")
-    suspend fun deleteNoteById(id: Int)
+    suspend fun hardDeleteNote(id: Int)
 
-    @Query("DELETE FROM notes")
-    suspend fun deleteAllNotes()
-
-    @Query("SELECT * FROM notes WHERE title LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%' ORDER BY updatedAt DESC")
-    fun searchNotes(query: String): Flow<List<NoteEntity>>
-
-    // Add user-specific search
-    @Query("SELECT * FROM notes WHERE userId = :userId AND (title LIKE '%' || :query || '%' OR description LIKE '%' || :query || '%') ORDER BY updatedAt DESC")
-    fun searchNotesByUser(userId: Int, query: String): Flow<List<NoteEntity>>
-
-    @Query("SELECT * FROM notes WHERE needsSync = 1")
-    suspend fun getNotesNeedingSync(): List<NoteEntity>
-
-    @Query("UPDATE notes SET needsSync = 0 WHERE id = :id")
-    suspend fun markAsSynced(id: Int)
-
-    // Add method to clear notes for a user (useful when logging out)
     @Query("DELETE FROM notes WHERE userId = :userId")
     suspend fun deleteNotesByUser(userId: Int)
+
+    // Sync-related queries
+    @Query("SELECT * FROM notes WHERE userId = :userId AND syncStatus != 'SYNCED'")
+    suspend fun getNotesNeedingSync(userId: Int): List<NoteEntity>
+
+    @Query("SELECT * FROM notes WHERE userId = :userId AND syncStatus = 'PENDING_CREATE'")
+    suspend fun getNotesNeedingCreate(userId: Int): List<NoteEntity>
+
+    @Query("SELECT * FROM notes WHERE userId = :userId AND syncStatus = 'PENDING_UPDATE'")
+    suspend fun getNotesNeedingUpdate(userId: Int): List<NoteEntity>
+
+    @Query("SELECT * FROM notes WHERE userId = :userId AND syncStatus = 'PENDING_DELETE'")
+    suspend fun getNotesNeedingDelete(userId: Int): List<NoteEntity>
+
+    @Query("UPDATE notes SET syncStatus = :status WHERE id = :id")
+    suspend fun updateSyncStatus(id: Int, status: SyncStatus)
+
+    @Query("UPDATE notes SET syncStatus = :status, serverId = :serverId WHERE id = :id")
+    suspend fun updateSyncStatusWithServerId(id: Int, status: SyncStatus, serverId: Int)
+
+    // Get next available local ID (negative numbers for local-only notes)
+    @Query("SELECT MIN(id) - 1 FROM notes WHERE id < 0")
+    suspend fun getNextLocalId(): Int?
 }
-
-

@@ -27,6 +27,7 @@ class NotesViewModel @Inject constructor(
     private var allNotes: List<com.example.notable.view.screen.NoteItem> = emptyList()
 
     init {
+        syncNotes()
         loadNotes()
         observeSearchQuery()
     }
@@ -39,7 +40,7 @@ class NotesViewModel @Inject constructor(
                         id = note.id.toString(),
                         title = note.title,
                         preview = note.description,
-                        backgroundColor = getRandomNoteColor()
+                        backgroundColor = getRandomNoteColor(note.id)
                     )
                 }
                 allNotes = noteItems
@@ -111,7 +112,7 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    private fun getRandomNoteColor(): androidx.compose.ui.graphics.Color {
+    private fun getRandomNoteColor(noteId: Int): androidx.compose.ui.graphics.Color {
         val colors = listOf(
             Color(0xFFFFF9C4), // Light Yellow
             Color(0xFFFFE0B2), // Light Orange
@@ -119,7 +120,11 @@ class NotesViewModel @Inject constructor(
             Color(0xFFF3E5F5), // Light Purple
             Color(0xFFE8F5E8), // Light Green
         )
-        return colors.random()
+        return if (noteId != -1) {
+            colors[noteId.mod(colors.size)]
+        } else {
+            Color.Gray
+        }
     }
 }
 
@@ -128,5 +133,6 @@ data class NotesUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val isSearchActive: Boolean = false,
-    val hasSearchResults: Boolean = true
+    val hasSearchResults: Boolean = true,
+    val noteColor: Color = Color.White, // Add this
 )

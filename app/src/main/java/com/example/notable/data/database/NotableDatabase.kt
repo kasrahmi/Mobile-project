@@ -9,7 +9,7 @@ import android.content.Context
 
 @Database(
     entities = [NoteEntity::class],
-    version = 2, // Increment version
+    version = 1, // Increment version
     exportSchema = false
 )
 abstract class NotableDatabase : RoomDatabase() {

@@ -2,8 +2,11 @@ package com.example.notable.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.notable.data.database.NoteDao
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.notable.data.database.NotableDatabase
+import com.example.notable.data.database.NoteDao
+import com.example.notable.data.database.SyncStatus
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,23 +18,28 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
+    private val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // Add new columns to existing table
+            database.execSQL("ALTER TABLE notes ADD COLUMN serverId INTEGER")
+            database.execSQL("ALTER TABLE notes ADD COLUMN userId INTEGER NOT NULL DEFAULT 0")
+            database.execSQL("ALTER TABLE notes ADD COLUMN syncStatus TEXT NOT NULL DEFAULT '${SyncStatus.SYNCED.name}'")
+        }
+    }
+
     @Provides
     @Singleton
-    fun provideNotableDatabase(
-        @ApplicationContext context: Context
-    ): NotableDatabase {
+    fun provideNotableDatabase(@ApplicationContext context: Context): NotableDatabase {
         return Room.databaseBuilder(
             context,
             NotableDatabase::class.java,
             "notable_database"
-        ).addMigrations(NotableDatabase.MIGRATION_1_2)
+        )
+            .fallbackToDestructiveMigration(false) // This will clear all data on schema changes
             .build()
     }
 
 
     @Provides
-    @Singleton
-    fun provideNoteDao(database: NotableDatabase): NoteDao {
-        return database.noteDao()
-    }
+    fun provideNoteDao(database: NotableDatabase): NoteDao = database.noteDao()
 }

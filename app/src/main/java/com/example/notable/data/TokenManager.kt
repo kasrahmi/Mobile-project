@@ -25,7 +25,7 @@ class TokenManager @Inject constructor(
         private const val TOKEN_EXPIRY_KEY = "token_expiry"
         private const val USER_INFO_KEY = "user_info"
         private const val ACCESS_TOKEN_LIFETIME_MS = 30 * 60 * 1000L // 30 minutes
-        private const val REFRESH_BUFFER_MS = 5 * 60 * 1000L // Refresh 5 minutes before expiry
+        private const val REFRESH_BUFFER_MS = 29 * 60 * 1000L // Refresh 5 minutes before expiry
 
         private const val USER_ID_KEY = "user_id"
         private const val USER_NAME_KEY = "user_name"

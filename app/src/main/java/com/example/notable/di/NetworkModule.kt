@@ -14,6 +14,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
+import javax.inject.Provider
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -23,10 +24,11 @@ object NetworkModule {
     @Singleton
     fun provideTokenRefreshInterceptor(
         tokenManager: TokenManager,
-        api: NotableApi
+        apiProvider: Provider<NotableApi> // ✅ Use Provider
     ): TokenRefreshInterceptor {
-        return TokenRefreshInterceptor(tokenManager, api)
+        return TokenRefreshInterceptor(tokenManager, apiProvider)
     }
+
 
     @Provides
     @Singleton
@@ -39,9 +41,11 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
+        tokenRefreshInterceptor: TokenRefreshInterceptor, // ✅ Inject the interceptor
         loggingInterceptor: HttpLoggingInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
+            .addInterceptor(tokenRefreshInterceptor) // ✅ Add it to the chain
             .addInterceptor(loggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
